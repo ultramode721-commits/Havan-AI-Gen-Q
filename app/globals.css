@@ -263,7 +263,39 @@ nav button:nth-child(4) {
   height: 36px;
   object-fit: contain;
   border-radius: 7px;
+  display: block;
+}
+.academy-logo {
+  position: relative;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 7px;
   background: white;
+}
+.academy-logo::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% -65%;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent, #ffffffbb, transparent);
+  transform: skewX(-18deg);
+  animation: logo-shimmer 4s ease-in-out infinite;
+}
+@keyframes logo-shimmer {
+  0%, 58% {
+    left: -65%;
+    opacity: 0;
+  }
+  65% {
+    opacity: 0.75;
+  }
+  82%, 100% {
+    left: 130%;
+    opacity: 0;
+  }
 }
 .academy b {
   font-size: 10px;
@@ -483,11 +515,41 @@ main {
   padding: 18px 17px 12px;
   box-shadow: var(--shadow);
 }
+.composer.generating {
+  border-color: transparent;
+  background-image:
+    linear-gradient(var(--surface), var(--surface)),
+    linear-gradient(115deg, var(--accent), var(--coral), var(--accent));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 220% 220%;
+  animation:
+    composer-glow 1.8s ease-in-out infinite,
+    composer-sweep 3s linear infinite;
+}
+@keyframes composer-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent), transparent 58%), 0 5px 16px color-mix(in srgb, var(--accent), transparent 82%);
+  }
+  50% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--coral), transparent 40%), 0 5px 24px color-mix(in srgb, var(--accent), transparent 66%);
+  }
+}
+@keyframes composer-sweep {
+  from {
+    background-position: 0 0, 0% 50%;
+  }
+  to {
+    background-position: 0 0, 100% 50%;
+  }
+}
 .composer textarea {
   border: 0;
   background: transparent;
   resize: none;
   min-height: 64px;
+  max-height: 220px;
+  overflow-y: hidden;
   padding: 0 4px;
   font-size: 14px;
   outline: none;
@@ -567,7 +629,31 @@ main {
   align-items: center;
   font-size: 11px;
   margin: 8px 4px;
+  padding: 7px 10px;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
   color: var(--accent);
+}
+.attachment-details {
+  display: grid;
+  min-width: 0;
+}
+.attachment-details b {
+  max-width: min(340px, 60vw);
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-details small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 9px;
 }
 .attachment button {
   margin-left: auto;
@@ -1268,3 +1354,4 @@ fieldset {
   width: 120px;
   accent-color: var(--accent);
 }
+

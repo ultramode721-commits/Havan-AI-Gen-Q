@@ -1,6 +1,6 @@
 # Feature status
 
-Audit date: 7 November 2026
+Last updated: 7 November 2026
 
 Status describes this local standalone checkout. It does not infer behavior from the live deployment.
 
@@ -11,7 +11,9 @@ Status describes this local standalone checkout. It does not infer behavior from
 | General tutor | Implemented, provider-dependent | Explicit mode uses server-side Groq. No key means a clear unavailable response. |
 | Direct OpenAI API | Disabled | No direct integration is present; this is an owner constraint. |
 | KaTeX answer rendering | Implemented | Markdown renderer supports mathematical notation; it does not perform symbolic computation. |
-| Havan Academy logo shimmer | Not implemented | Existing PNG has a white background; the SVG wordmark contains a gradient rectangle. |
+| Havan Academy logo shimmer | Implemented | The original academy mark remains intact beneath a CSS shimmer; reduced-motion settings disable the animation. |
+| Chat composer | Implemented | Text grows to 220px, then scrolls internally. The generation glow follows the real chat request state. |
+| Document attachment preview | Implemented | Shows filename, type, and size; preview remains until a successful send or removal. Upload preparation is separate from AI generation. |
 | Chat history | Browser-local | Stored in localStorage; no account or cloud synchronization. |
 | User accounts and OAuth | Not implemented | No registration, Google/GitHub sign-in, or user-owned identity store. |
 | Memory and recoverable deletion | Not implemented | Browser-local history is not user-controlled cross-session memory. |
@@ -29,3 +31,4 @@ Status describes this local standalone checkout. It does not infer behavior from
 | Rate limiting | Not implemented | Request validation and size bounds exist; distributed per-user quotas do not. |
 | Security boundaries | Partial pilot controls | Same-origin checks, input validation, bounded requests, and optional shared bearer-token gate are present. No per-user authorization or durable identity isolation. |
 | Existing automated suite | 21 tests pass in this audit | See docs/TEST_REPORT.md. The historical 52-test claim is not present in this checkout. |
+

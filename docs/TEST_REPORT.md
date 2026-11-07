@@ -21,6 +21,16 @@ Run date: 7 November 2026
 
 The suite covers schema and domain validation, Unicode tokenization, retrieval limits, exam shuffling and signing, deterministic grading, strict/general chat boundaries, request validation and origin checks, PDF/DOCX text extraction, image-provider failure behavior, and Groq fallback behavior.
 
+## Milestone 1 interface verification
+
+| Check | Result | Details |
+| --- | --- | --- |
+| npm test | PASS | 21 tests passed; 0 failed. |
+| npm run typecheck | PASS | TypeScript completed with no diagnostics after the production build generated Next.js types. |
+| npm run build | PASS | Next.js production build completed and emitted the app page and API routes. |
+
+The milestone adds an auto-growing message field, a document preview with type and size, upload status separate from response generation, and a generation glow attached to the live request state. The existing academy logo has a shimmer animation unless reduced motion is enabled. A browser preview was not available in this environment, so visual device coverage remains unverified.
+
 ## End-to-end student scenario plan
 
 This plan is required before the broader learning features are considered complete. These scenarios were not executed in this audit. Items depending on absent features are marked blocked, not passed.
@@ -55,3 +65,4 @@ The first sandboxed test invocation failed before loading tests because Node's u
 ## Historical test-count reconciliation
 
 The supplied directive mentioned 52 tests as a historical claim. This checkout contains one test file with 21 test cases, and all 21 passed in this run. No 52-test suite was found or executed.
+

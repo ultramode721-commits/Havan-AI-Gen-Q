@@ -65,10 +65,12 @@ export default function HavanApp() {
     [chatId, setChatId] = useState(""),
     [search, setSearch] = useState(""),
     [busy, setBusy] = useState(false),
+    [uploading, setUploading] = useState(false),
     [error, setError] = useState(""),
     [attachment, setAttachment] = useState<{
       name: string;
       text: string;
+      size: number;
     } | null>(null),
     [loaded, setLoaded] = useState(false),
     [copied, setCopied] = useState("");
@@ -79,7 +81,8 @@ export default function HavanApp() {
   }, [view]);
   const controller = useRef<AbortController | null>(null),
     bottom = useRef<HTMLDivElement>(null),
-    fileRef = useRef<HTMLInputElement>(null);
+    fileRef = useRef<HTMLInputElement>(null),
+    textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     try {
       setChats(JSON.parse(localStorage.getItem("havan-chats") || "[]"));
@@ -101,8 +104,16 @@ export default function HavanApp() {
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, busy]);
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = "0px";
+    const maxHeight = 220;
+    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+    textarea.style.overflowY = textarea.scrollHeight > maxHeight ? "auto" : "hidden";
+  }, [input]);
   function newChat() {
-    if (busy) return;
+    if (busy || uploading) return;
     setView("Chat");
     setMessages([]);
     setChatId("");
@@ -110,7 +121,8 @@ export default function HavanApp() {
     setError("");
   }
   async function send(prompt = input) {
-    if (!prompt.trim() || busy) return;
+    if (!prompt.trim() || busy || uploading) return;
+    const attachedFile = attachment;
     const id = chatId || newId();
     setChatId(id);
     const next: Message[] = [
@@ -132,7 +144,7 @@ export default function HavanApp() {
           messages: next
             .slice(-20)
             .map(({ role, content }) => ({ role, content })),
-          attachment: attachment?.text,
+          attachment: attachedFile?.text,
         },
         ctl.signal,
       );
@@ -147,6 +159,7 @@ export default function HavanApp() {
         },
       ];
       setMessages(updated);
+      if (attachedFile) setAttachment(null);
       setChats((old) =>
         [
           { id, title: next[0].content.slice(0, 60), messages: updated },
@@ -165,17 +178,18 @@ export default function HavanApp() {
     }
   }
   async function upload(file: File) {
+    if (busy || uploading) return;
     if (file.size > 5 * 1024 * 1024) {
       setError("Maximum file size is 5 MB.");
       return;
     }
-    setBusy(true);
+    setUploading(true);
     setError("");
     try {
       const form = new FormData();
       form.append("file", file);
       const result = await api("/api/ingest", form);
-      setAttachment({ name: result.name, text: result.text });
+      setAttachment({ name: result.name, text: result.text, size: file.size });
       setError(
         result.notice +
           (result.truncated
@@ -185,7 +199,7 @@ export default function HavanApp() {
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      setBusy(false);
+      setUploading(false);
     }
   }
   const welcome = !messages.length;
@@ -208,14 +222,14 @@ export default function HavanApp() {
             <X size={18} />
           </button>
         </div>
-        <button className="new-chat" onClick={newChat} disabled={busy}>
+        <button className="new-chat" onClick={newChat} disabled={busy || uploading}>
           <Plus size={19} />
           New conversation<span>↗</span>
         </button>
         <nav>
           {navigation.map(({ name, icon: Icon }) => (
             <button
-              disabled={busy && name !== "Chat"}
+              disabled={(busy || uploading) && name !== "Chat"}
               className={view === name ? "active" : ""}
               onClick={() => {
                 setView(name);
@@ -262,7 +276,9 @@ export default function HavanApp() {
           {!chats.length && <p>Your next discovery starts here.</p>}
         </div>
         <div className="academy">
-          <img src="/havan-academy.png" alt="Havan Academy logo" />
+          <span className="academy-logo">
+            <img src="/havan-academy.png" alt="Havan Academy logo" />
+          </span>
           <div>
             <b>Built for your next chapter.</b>
             <small>Ethiopian higher education</small>
@@ -455,10 +471,16 @@ export default function HavanApp() {
               {attachment && (
                 <div className="attachment">
                   <FileText size={15} />
-                  {attachment.name}
+                  <span className="attachment-details">
+                    <b>{attachment.name}</b>
+                    <small>
+                      {attachment.name.split(".").pop()?.toUpperCase()} · {Math.max(1, Math.round(attachment.size / 1024))} KB
+                    </small>
+                  </span>
                   <button
                     className="icon"
                     aria-label="Remove attachment"
+                    disabled={busy || uploading}
                     onClick={() => setAttachment(null)}
                   >
                     <X size={13} />
@@ -470,14 +492,21 @@ export default function HavanApp() {
                   {error}
                 </p>
               )}
+              {uploading && (
+                <p className="composer-notice upload-status" role="status">
+                  Preparing your document…
+                </p>
+              )}
               <form
-                className="composer"
+                className={`composer ${busy ? "generating" : ""}`}
+                aria-busy={busy}
                 onSubmit={(e) => {
                   e.preventDefault();
                   void send();
                 }}
               >
                 <textarea
+                  ref={textareaRef}
                   aria-label="Message Havan AI"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -492,7 +521,7 @@ export default function HavanApp() {
                     }
                   }}
                   placeholder="Message Havan AI…"
-                  rows={2}
+                  rows={1}
                   maxLength={12000}
                 />
                 <div className="composer-toolbar">
@@ -500,7 +529,7 @@ export default function HavanApp() {
                     <button
                       type="button"
                       className="icon"
-                      disabled={busy}
+                      disabled={busy || uploading}
                       aria-label="Attach document"
                       onClick={() => fileRef.current?.click()}
                     >
@@ -562,7 +591,7 @@ export default function HavanApp() {
                       <button
                         type="submit"
                         className="send"
-                        disabled={!input.trim()}
+                        disabled={!input.trim() || uploading}
                         aria-label="Send message"
                       >
                         <ArrowUp size={21} />
@@ -703,3 +732,4 @@ export default function HavanApp() {
     </div>
   );
 }
+
