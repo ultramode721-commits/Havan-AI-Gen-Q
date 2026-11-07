@@ -51,7 +51,7 @@ Enter the workspace access token in Settings → Connect workspace. The token st
 ## What works
 
 - Responsive light/dark interface with the supplied Havan Academy logo and cyan/coral Havan AI branding. No competitor logo is used.
-- Searchable local conversation history, export/clear tools, project notes, Markdown tables, fenced code and KaTeX mathematics.
+- Searchable local conversation history with pin, rename, highlight, recoverable trash, and confirmed permanent deletion; project notes, Markdown tables, fenced code and KaTeX mathematics.
 - Strict database chat with fail-closed retrieval and source provenance. Casual greetings receive a short greeting.
 - Explicit General tutor mode with server-only Groq or Qwen routing, bounded output, an 18-second total network budget, and optional same-provider fallback models. General mode supports user-selected languages; quality is not guaranteed or independently benchmarked.
 - English/Mathematics diagnostics restricted to UAT/trained questions, domain charts, and exportable reports.

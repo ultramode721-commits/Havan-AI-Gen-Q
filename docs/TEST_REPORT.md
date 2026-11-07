@@ -1,6 +1,7 @@
 # Test report
 
-Run date: 7 November 2026
+Baseline run date: 7 November 2026
+Latest update: 8 November 2026
 
 ## Environment
 
@@ -35,7 +36,15 @@ The milestone adds an auto-growing message field, a document preview with type a
 
 The model routing suite verifies that Havan Pro sends its configured model to Groq, Havan 2.5 Sol sends its configured model to the server-configured Qwen endpoint, provider readiness contains no credentials, and Jarvis reports a clear not-connected error without Qwen configuration. Live provider calls were not made because no provider credentials were supplied. No direct OpenAI API route was added.
 
-Latest checks on 8 November 2026: `npm test` passed 25/25, `npm run typecheck` passed, and `npm run build` passed. The four added routing tests use mocked provider responses and do not incur provider charges.
+The four routing tests use mocked provider responses and do not incur provider charges. Live provider calls were not made because credentials were not supplied.
+
+## Milestone 3 local history verification
+
+Four tests cover title validation, pin/highlight state, soft-delete/restore, and permanent removal. Permanent removal is guarded by an in-app confirmation. The localStorage sidebar flow was not run in a browser.
+
+## Latest consolidated verification
+
+Checks on 8 November 2026: `npm test` passed 29/29, `npm run typecheck` passed, and `npm run build` passed.
 
 ## End-to-end student scenario plan
 
@@ -50,7 +59,7 @@ This plan is required before the broader learning features are considered comple
 | 5 | Ask for a chemistry reaction equation | The equation renders clearly and is not presented as scientifically validated without a source. | Not run; chemistry source data is absent. |
 | 6 | Complete a quiz and request explanations | Server-side answer keys determine the score and each response includes the stored explanation. | API grading is covered by unit tests; full student browser flow not run. |
 | 7 | Ask a current-events question requiring live search | Retrieved sources and citations are visible and distinguishable from generated explanation. | Blocked; live search is not implemented. |
-| 8 | Save and restore a conversation | The same browser profile can restore local history; no cloud sync is claimed. | Not run end-to-end; localStorage is used. |
+| 8 | Save and restore a conversation | The same browser profile can restore local history; no cloud sync is claimed. | State operations tested; browser flow not run end-to-end. |
 | 9 | Ask a question in a non-English language | General mode responds in the selected language when supported and does not claim native-level quality. | Not run against a live provider. |
 | 10 | Export a study conversation to PDF | A branded PDF preserves headings and mathematical text with page breaks. | Blocked; PDF export is not implemented. |
 

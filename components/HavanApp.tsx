@@ -18,14 +18,19 @@ import {
   Mic,
   MoreHorizontal,
   Moon,
+  Pencil,
   Paperclip,
+  Pin,
   Plus,
+  RotateCcw,
   Search,
   Settings,
   ShieldCheck,
   Sparkles,
   Square,
+  Star,
   Sun,
+  Trash2,
   X,
 } from "lucide-react";
 import { Markdown } from "./Markdown";
@@ -33,6 +38,14 @@ import dynamic from "next/dynamic";
 const Exam = dynamic(() => import("./Exam").then((m) => m.Exam));
 const Portal = dynamic(() => import("./Portals").then((m) => m.Portal));
 import { api, download, newId, setAccessToken } from "@/lib/client";
+import {
+  moveChatToTrash,
+  permanentlyDeleteChat,
+  renameChat,
+  restoreChat,
+  updateChatFlags,
+} from "@/lib/chat-history";
+import type { ChatRecord } from "@/lib/chat-history";
 import type { HavanModelId, RoutedModel } from "@/lib/models";
 type Message = {
   id: string;
@@ -42,7 +55,7 @@ type Message = {
   mode?: string;
   model?: RoutedModel | null;
 };
-type Chat = { id: string; title: string; messages: Message[] };
+type Chat = ChatRecord<Message>;
 const navigation = [
   { name: "Chat", icon: MessageCircle },
   { name: "Predictor", icon: ChartNoAxesCombined },
@@ -65,8 +78,13 @@ export default function HavanApp() {
     [input, setInput] = useState(""),
     [messages, setMessages] = useState<Message[]>([]),
     [chats, setChats] = useState<Chat[]>([]),
+    [trash, setTrash] = useState<Chat[]>([]),
     [chatId, setChatId] = useState(""),
     [search, setSearch] = useState(""),
+    [showTrash, setShowTrash] = useState(false),
+    [menuChatId, setMenuChatId] = useState(""),
+    [renamingChatId, setRenamingChatId] = useState(""),
+    [renameDraft, setRenameDraft] = useState(""),
     [busy, setBusy] = useState(false),
     [uploading, setUploading] = useState(false),
     [error, setError] = useState(""),
@@ -89,6 +107,7 @@ export default function HavanApp() {
   useEffect(() => {
     try {
       setChats(JSON.parse(localStorage.getItem("havan-chats") || "[]"));
+      setTrash(JSON.parse(localStorage.getItem("havan-trash") || "[]"));
       setDark(localStorage.getItem("havan-theme") === "dark");
     } catch {}
     setLoaded(true);
@@ -104,6 +123,9 @@ export default function HavanApp() {
   useEffect(() => {
     if (loaded) localStorage.setItem("havan-chats", JSON.stringify(chats));
   }, [chats, loaded]);
+  useEffect(() => {
+    if (loaded) localStorage.setItem("havan-trash", JSON.stringify(trash));
+  }, [trash, loaded]);
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, busy]);
@@ -122,6 +144,45 @@ export default function HavanApp() {
     setChatId("");
     setAttachment(null);
     setError("");
+    setShowTrash(false);
+    setMenuChatId("");
+  }
+  function saveChatTitle(id: string) {
+    if (busy || uploading) return;
+    setChats((old) => renameChat(old, id, renameDraft));
+    setRenamingChatId("");
+    setRenameDraft("");
+  }
+  function moveConversationToTrash(id: string) {
+    if (busy || uploading) return;
+    const moved = moveChatToTrash(chats, trash, id);
+    setChats(moved.chats);
+    setTrash(moved.trash);
+    setMenuChatId("");
+    if (chatId === id) {
+      setChatId("");
+      setMessages([]);
+      setAttachment(null);
+    }
+  }
+  function restoreConversation(id: string) {
+    const restored = restoreChat(chats, trash, id);
+    setChats(restored.chats);
+    setTrash(restored.trash);
+    const conversation = restored.chats.find((item) => item.id === id);
+    if (conversation) {
+      setChatId(id);
+      setMessages(conversation.messages);
+      setView("Chat");
+      setAttachment(null);
+      setShowTrash(false);
+    }
+  }
+  function permanentlyRemoveConversation(id: string) {
+    if (busy || uploading) return;
+    if (!window.confirm("Permanently delete this conversation? This cannot be undone."))
+      return;
+    setTrash((old) => permanentlyDeleteChat(old, id));
   }
   async function send(prompt = input) {
     if (!prompt.trim() || busy || uploading) return;
@@ -167,8 +228,16 @@ export default function HavanApp() {
       if (attachedFile) setAttachment(null);
       setChats((old) =>
         [
-          { id, title: next[0].content.slice(0, 60), messages: updated },
-          ...old.filter((c) => c.id !== id),
+          {
+            id,
+            title:
+              old.find((chat) => chat.id === id)?.title ??
+              next[0].content.slice(0, 60),
+            messages: updated,
+            pinned: old.find((chat) => chat.id === id)?.pinned,
+            highlighted: old.find((chat) => chat.id === id)?.highlighted,
+          },
+          ...old.filter((chat) => chat.id !== id),
         ].slice(0, 50),
       );
     } catch (e) {
@@ -208,6 +277,13 @@ export default function HavanApp() {
     }
   }
   const welcome = !messages.length;
+  const historyItems = (showTrash ? trash : chats)
+    .filter((chat) => chat.title.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) =>
+      showTrash
+        ? (b.deletedAt ?? 0) - (a.deletedAt ?? 0)
+        : Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)),
+    );
   return (
     <div className={`app ${open ? "sidebar-open" : "sidebar-closed"}`}>
       <aside className="sidebar">
@@ -251,7 +327,20 @@ export default function HavanApp() {
           ))}
         </nav>
         <div className="recent-label">
-          YOUR CONVERSATIONS <Search size={13} />
+          <span>{showTrash ? "RECENTLY DELETED" : "YOUR CONVERSATIONS"}</span>
+          <div className="history-tools">
+            <button
+              className="history-switch"
+              onClick={() => {
+                setShowTrash(!showTrash);
+                setMenuChatId("");
+                setRenamingChatId("");
+              }}
+            >
+              {showTrash ? "Chats" : `Trash${trash.length ? ` (${trash.length})` : ""}`}
+            </button>
+            <Search size={13} />
+          </div>
         </div>
         <input
           className="history-search"
@@ -261,24 +350,153 @@ export default function HavanApp() {
           placeholder="Search your chats…"
         />
         <div className="history">
-          {chats
-            .filter((c) => c.title.toLowerCase().includes(search.toLowerCase()))
-            .map((c) => (
-              <button
-                disabled={busy}
-                onClick={() => {
-                  setView("Chat");
-                  setChatId(c.id);
-                  setMessages(c.messages);
-                  setAttachment(null);
-                }}
-                key={c.id}
+          {historyItems.map((chat) =>
+            showTrash ? (
+              <div className="history-row deleted" key={chat.id}>
+                <button
+                  className="history-open"
+                  aria-label={`Restore and open ${chat.title}`}
+                  disabled={busy || uploading}
+                  onClick={() => restoreConversation(chat.id)}
+                >
+                  <MessageCircle size={14} />
+                  <span>{chat.title}</span>
+                </button>
+                <button
+                  className="history-action"
+                  aria-label={`Restore ${chat.title}`}
+                  disabled={busy || uploading}
+                  onClick={() => restoreConversation(chat.id)}
+                >
+                  <RotateCcw size={14} />
+                </button>
+                <button
+                  className="history-action danger"
+                  aria-label={`Permanently delete ${chat.title}`}
+                  disabled={busy || uploading}
+                  onClick={() => permanentlyRemoveConversation(chat.id)}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ) : (
+              <div
+                className={`history-row ${view === "Chat" && chat.id === chatId ? "active" : ""} ${chat.highlighted ? "highlighted" : ""}`}
+                key={chat.id}
               >
-                <MessageCircle size={14} />
-                <span>{c.title}</span>
-              </button>
-            ))}
-          {!chats.length && <p>Your next discovery starts here.</p>}
+                {renamingChatId === chat.id ? (
+                  <form
+                    className="history-rename"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      saveChatTitle(chat.id);
+                    }}
+                  >
+                    <input
+                      aria-label={`Rename ${chat.title}`}
+                      value={renameDraft}
+                      autoFocus
+                      maxLength={80}
+                      onChange={(event) => setRenameDraft(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Escape") setRenamingChatId("");
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      className="history-action"
+                      aria-label="Save conversation name"
+                      disabled={busy || uploading}
+                    >
+                      <Check size={14} />
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    className="history-open"
+                    disabled={busy || uploading}
+                    onClick={() => {
+                      setView("Chat");
+                      setChatId(chat.id);
+                      setMessages(chat.messages);
+                      setAttachment(null);
+                    }}
+                  >
+                    <MessageCircle size={14} />
+                    <span>{chat.title}</span>
+                    {chat.pinned && <Pin size={12} aria-label="Pinned" />}
+                  </button>
+                )}
+                <button
+                  className="history-action menu-trigger"
+                  aria-label={`Conversation actions for ${chat.title}`}
+                  aria-expanded={menuChatId === chat.id}
+                  disabled={busy || uploading}
+                  onClick={() =>
+                    setMenuChatId(menuChatId === chat.id ? "" : chat.id)
+                  }
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+                {menuChatId === chat.id && (
+                  <div className="history-menu">
+                    <button
+                      disabled={busy || uploading}
+                      onClick={() => {
+                        setChats((old) =>
+                          updateChatFlags(old, chat.id, {
+                            pinned: !chat.pinned,
+                            highlighted: chat.highlighted,
+                          }),
+                        );
+                        setMenuChatId("");
+                      }}
+                    >
+                      <Pin size={14} /> {chat.pinned ? "Unpin" : "Pin"}
+                    </button>
+                    <button
+                      disabled={busy || uploading}
+                      onClick={() => {
+                        setRenameDraft(chat.title);
+                        setRenamingChatId(chat.id);
+                        setMenuChatId("");
+                      }}
+                    >
+                      <Pencil size={14} /> Rename
+                    </button>
+                    <button
+                      disabled={busy || uploading}
+                      onClick={() => {
+                        setChats((old) =>
+                          updateChatFlags(old, chat.id, {
+                            pinned: chat.pinned,
+                            highlighted: !chat.highlighted,
+                          }),
+                        );
+                        setMenuChatId("");
+                      }}
+                    >
+                      <Star size={14} /> {chat.highlighted ? "Remove highlight" : "Highlight"}
+                    </button>
+                    <button
+                      className="danger"
+                      disabled={busy || uploading}
+                      onClick={() => moveConversationToTrash(chat.id)}
+                    >
+                      <Trash2 size={14} /> Move to trash
+                    </button>
+                  </div>
+                )}
+              </div>
+            ),
+          )}
+          {!historyItems.length && (
+            <p>
+              {showTrash
+                ? "Deleted conversations will appear here for recovery."
+                : "Your next discovery starts here."}
+            </p>
+          )}
         </div>
         <div className="academy">
           <span className="academy-logo">

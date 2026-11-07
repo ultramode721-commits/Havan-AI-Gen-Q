@@ -15,9 +15,9 @@ Status describes this local standalone checkout. It does not infer behavior from
 | Havan Academy logo shimmer | Implemented | The original academy mark remains intact beneath a CSS shimmer; reduced-motion settings disable the animation. |
 | Chat composer | Implemented | Text grows to 220px, then scrolls internally. The generation glow follows the real chat request state. |
 | Document attachment preview | Implemented | Shows filename, type, and size; preview remains until a successful send or removal. Upload preparation is separate from AI generation. |
-| Chat history | Browser-local | Stored in localStorage; no account or cloud synchronization. |
+| Chat history | Browser-local, user-controlled | Search, pin, rename, highlight, soft-delete to trash, restore, and confirm before permanent deletion. Stored in localStorage; no account or cloud synchronization. |
 | User accounts and OAuth | Not implemented | No registration, Google/GitHub sign-in, or user-owned identity store. |
-| Memory and recoverable deletion | Not implemented | Browser-local history is not user-controlled cross-session memory. |
+| Memory and recoverable deletion | Partial | Browser-local trash survives reloads and supports restore/permanent deletion. No account-wide memory or cross-device sync. |
 | Live web search and web citations | Not implemented | Local source disclosures are not live-web citations. |
 | File text extraction | Implemented with limits | PDF text layer, DOCX, TXT, MD, JSON, and CSV are supported. Scanned-image OCR and image understanding are absent. |
 | Voice input and speech output | Not implemented | No microphone, transcription, or text-to-speech flow. |
@@ -31,5 +31,5 @@ Status describes this local standalone checkout. It does not infer behavior from
 | API usage and cost dashboard | Not implemented | No per-user token accounting, budget view, or model recommendation system. |
 | Rate limiting | Not implemented | Request validation and size bounds exist; distributed per-user quotas do not. |
 | Security boundaries | Partial pilot controls | Same-origin checks, input validation, bounded requests, and optional shared bearer-token gate are present. No per-user authorization or durable identity isolation. |
-| Existing automated suite | 25 tests pass as of 8 November 2026 | See docs/TEST_REPORT.md. The historical 52-test claim is not present in this checkout. |
+| Existing automated suite | 29 tests pass as of 8 November 2026 | See docs/TEST_REPORT.md. The historical 52-test claim is not present in this checkout. |
 

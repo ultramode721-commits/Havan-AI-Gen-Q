@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-08 - Milestone 3 local history controls
+
+- Added chat pinning, renaming, highlighting, and a searchable Recently Deleted view.
+- Added recoverable deletion and restoration backed by browser-local storage; permanent deletion requires an in-app confirmation.
+- Added isolated unit tests for title validation, flags, restoration, and permanent removal.
+- Cloud sync and account-wide memory remain unimplemented.
+
 ## 2026-11-08 - Milestone 2 model routing
 
 - Added a server-side model router: Havan Pro uses Groq; Havan 2.5 Sol and Havan-3 Jarvis use separate Qwen model settings.
