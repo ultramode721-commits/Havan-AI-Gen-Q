@@ -15,7 +15,7 @@ The main interface is in components/HavanApp.tsx. API routes are under app/api. 
 ## What is present
 
 - Strict mode retrieves local passages and does not generate unsupported prose.
-- General tutor mode can call Groq with a server-only key.
+- General tutor can call the selected Groq or Qwen route with server-only credentials; model profiles remain unavailable until configured.
 - Markdown answers support KaTeX rendering.
 - Practice exams use five choices, signed sessions, server-side scoring, and explanations.
 - PDF, DOCX, TXT, Markdown, JSON, and CSV text extraction is available within documented limits.
@@ -46,3 +46,4 @@ An untouched copy of the supplied app was made before local validation or docume
 ## Current milestone
 
 Milestone 0, source recovery and audit, is documented in this folder. No application features were changed in this milestone.
+

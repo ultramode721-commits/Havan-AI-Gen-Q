@@ -53,7 +53,7 @@ Enter the workspace access token in Settings → Connect workspace. The token st
 - Responsive light/dark interface with the supplied Havan Academy logo and cyan/coral Havan AI branding. No competitor logo is used.
 - Searchable local conversation history, export/clear tools, project notes, Markdown tables, fenced code and KaTeX mathematics.
 - Strict database chat with fail-closed retrieval and source provenance. Casual greetings receive a short greeting.
-- Explicit General tutor mode with server-only Groq authentication, bounded output, an 18-second total network budget, and an optional same-provider fallback model. General mode supports user-selected languages; quality is not guaranteed or independently benchmarked.
+- Explicit General tutor mode with server-only Groq or Qwen routing, bounded output, an 18-second total network budget, and optional same-provider fallback models. General mode supports user-selected languages; quality is not guaranteed or independently benchmarked.
 - English/Mathematics diagnostics restricted to UAT/trained questions, domain charts, and exportable reports.
 - Randomized timed practice with exactly five choices, flags, clear-choice controls, progress, server-side keys, signed tickets, scoring and explanations. Active sessions keep their deadline when switching sidebar views. Reloading the page starts over.
 - On-demand file extraction: text PDFs up to 100 pages, DOCX, TXT, MD, JSON and CSV up to 5 MB. No runtime PDF parsing in the normal RAG path. Session uploads are explicitly unverified references and never silently become trusted exam data.
@@ -63,9 +63,13 @@ Enter the workspace access token in Settings → Connect workspace. The token st
 
 ## Two answer modes
 
-**Database only** is the default. It searches an in-memory inverted index built once per server process from the four JSON files. It restricts context to five chunks / 6,500 characters (plus an optional session reference), avoiding runtime PDF parsing. If Groq is configured it can select exact quotes through the strict system prompt; every returned quote must be a verbatim substring of an identified context chunk. Invalid or unavailable model selection falls back only to retrieved excerpts, never generic model knowledge. No key is required to return local excerpts. Excerpts remain in the source language. This controls unsupported generation; it cannot make incorrect source material true. Retrieval relevance and database completeness still need human review.
+**Database only** is the default. It searches an in-memory inverted index built once per server process from the four JSON files. It restricts context to five chunks / 6,500 characters (plus an optional session reference), avoiding runtime PDF parsing. If the selected provider is configured it can select exact quotes through the strict system prompt; every returned quote must be a verbatim substring of an identified context chunk. Invalid or unavailable model selection falls back only to retrieved excerpts, never generic model knowledge. No key is required to return local excerpts. Excerpts remain in the source language. This controls unsupported generation; it cannot make incorrect source material true. Retrieval relevance and database completeness still need human review.
 
-**General tutor** must be explicitly selected. It allows the model's general knowledge, conversation and translation, marks that mode in the UI and does not imply that answers are verified database facts. This separation resolves the otherwise incompatible requirements of strict local-only answers and universal open-domain assistance. There is no automatic switch from strict to general.
+**General tutor** must be explicitly selected. It allows the selected provider's general knowledge, conversation and translation, marks that mode in the UI and does not imply that answers are verified database facts. This separation resolves the otherwise incompatible requirements of strict local-only answers and universal open-domain assistance. There is no automatic switch from strict to general.
+
+## Havan model profiles
+
+The composer model selector routes **Havan Pro** to `HAVAN_PRO_GROQ_MODEL` (or the existing `GROQ_MODEL`), and **Havan 2.5 Sol** / **Havan-3 Jarvis** to their separate Qwen model IDs. Configure Qwen with `QWEN_API_KEY` and `QWEN_API_BASE_URL`, using the full HTTPS Chat Completions endpoint for the Alibaba Cloud region and workspace that owns the key. The official regional endpoint format and model access can change; use the current [Qwen API setup guide](https://help.aliyun.com/en/model-studio/first-api-call-to-qwen) and [model list](https://help.aliyun.com/en/model-studio/list-models). Models without provider credentials are disabled in the selector. These names are app profiles that route to provider models, not Havan-owned model weights. The profiles have different teaching instructions, but do not provide unconnected voice, live search, image analysis, interactive quiz widgets, or scientific simulations. Direct OpenAI API usage remains disabled.
 
 ## Install real datasets
 
@@ -101,3 +105,4 @@ No deployment was performed as part of this code delivery. A public multiuser se
 - File extraction may lose tables/layout and is not a universal or exact reader. Uploading reference text sends the selected excerpt to Groq only when a model-assisted request is made. Keep private documents on systems you trust.
 
 See [docs/VERIFICATION.md](docs/VERIFICATION.md) for actual checks and remaining gaps, [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for boundaries, and [docs/SOURCE_REVIEW.md](docs/SOURCE_REVIEW.md) for the GitHub review.
+

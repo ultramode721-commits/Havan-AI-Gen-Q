@@ -1,6 +1,6 @@
 # Feature status
 
-Last updated: 7 November 2026
+Last updated: 8 November 2026
 
 Status describes this local standalone checkout. It does not infer behavior from the live deployment.
 
@@ -8,7 +8,8 @@ Status describes this local standalone checkout. It does not infer behavior from
 | --- | --- | --- |
 | Next.js application shell | Implemented | App Router page, responsive layout, and server routes are present. |
 | Strict local-source chat | Implemented, data empty | Retrieval is lexical and source-bounded. The four authoritative data files have no records. |
-| General tutor | Implemented, provider-dependent | Explicit mode uses server-side Groq. No key means a clear unavailable response. |
+| General tutor | Implemented, provider-dependent | Uses the selected server-side Groq or Qwen route. No credentials means a clear unavailable response. |
+| Havan model selector | Implemented, provider-dependent | Havan Pro routes to Groq; Havan 2.5 Sol and Havan-3 Jarvis route to separate Qwen model settings. Status disables profiles whose provider is not configured. Model prompts differ; voice, live search, visual quiz widgets, and scientific simulations remain unavailable. |
 | Direct OpenAI API | Disabled | No direct integration is present; this is an owner constraint. |
 | KaTeX answer rendering | Implemented | Markdown renderer supports mathematical notation; it does not perform symbolic computation. |
 | Havan Academy logo shimmer | Implemented | The original academy mark remains intact beneath a CSS shimmer; reduced-motion settings disable the animation. |
@@ -30,5 +31,5 @@ Status describes this local standalone checkout. It does not infer behavior from
 | API usage and cost dashboard | Not implemented | No per-user token accounting, budget view, or model recommendation system. |
 | Rate limiting | Not implemented | Request validation and size bounds exist; distributed per-user quotas do not. |
 | Security boundaries | Partial pilot controls | Same-origin checks, input validation, bounded requests, and optional shared bearer-token gate are present. No per-user authorization or durable identity isolation. |
-| Existing automated suite | 21 tests pass in this audit | See docs/TEST_REPORT.md. The historical 52-test claim is not present in this checkout. |
+| Existing automated suite | 25 tests pass as of 8 November 2026 | See docs/TEST_REPORT.md. The historical 52-test claim is not present in this checkout. |
 

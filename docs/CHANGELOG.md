@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-08 - Milestone 2 model routing
+
+- Added a server-side model router: Havan Pro uses Groq; Havan 2.5 Sol and Havan-3 Jarvis use separate Qwen model settings.
+- Added an operator-configured HTTPS Qwen Chat Completions endpoint, bounded requests, safe errors, and an optional same-provider fallback.
+- Connected model selection to both General tutor requests and strict source-quote selection; the selected provider and model are shown on assistant replies.
+- Added provider readiness to the status API and disabled unconfigured models in the selector.
+- Added mode-specific teaching prompts that explicitly avoid claiming unavailable web, voice, visual quiz, or simulation features.
+- Direct OpenAI API use remains disabled.
+
 ## 2026-11-07 - Milestone 1 chat interface
 
 - Added an auto-growing composer with an internal scroll limit for long prompts.

@@ -101,7 +101,7 @@ test("general tutor reports missing key honestly", async () => {
     }),
   );
   assert.equal(r.status, 503);
-  assert.match((await r.json()).error, /Groq is not configured/);
+  assert.match((await r.json()).error, /Havan Pro is not connected/);
 });
 test("invalid chat body returns 400", async () => {
   assert.equal((await chat(req("/api/chat", { messages: [] }))).status, 400);
@@ -259,3 +259,4 @@ test("canonical proxy origin is accepted without trusting arbitrary forwarded he
     delete process.env.HAVAN_APP_ORIGIN;
   }
 });
+

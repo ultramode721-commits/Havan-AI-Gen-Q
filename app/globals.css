@@ -576,6 +576,25 @@ main {
   padding: 0 9px;
   font-size: 10px;
 }
+.model-select {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  border-radius: 20px;
+  background: var(--soft);
+  color: var(--accent);
+  padding: 0 9px;
+  font-size: 10px;
+}
+.model-select select {
+  border: 0;
+  padding: 7px 0;
+  min-width: 0;
+  max-width: 165px;
+  background: transparent;
+  outline: none;
+}
 .mode-select select {
   border: 0;
   padding: 7px 0;
@@ -1248,6 +1267,25 @@ fieldset {
   }
   .mode-select select {
     max-width: 110px;
+  }
+  .model-select {
+    font-size: 9px;
+    padding: 0 5px;
+    gap: 1px;
+  }
+  .model-select select {
+    max-width: min(132px, 36vw);
+  }
+  .composer-toolbar {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+  .composer-toolbar > .actions:first-child {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .composer-toolbar > .actions:last-child {
+    margin-left: auto;
   }
   .composer-toolbar .actions {
     gap: 4px;

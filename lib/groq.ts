@@ -3,6 +3,7 @@ type Message = { role: "system" | "user" | "assistant"; content: string };
 export async function complete(
   messages: Message[],
   fetcher: typeof fetch = fetch,
+  primaryModel?: string,
 ) {
   const key = process.env.GROQ_API_KEY;
   if (!key)
@@ -11,7 +12,7 @@ export async function complete(
       "Groq is not configured. Set GROQ_API_KEY on the server.",
     );
   const models = [
-    process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+    primaryModel || process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
     process.env.GROQ_FALLBACK_MODEL,
   ].filter((m): m is string => !!m);
   const deadline = Date.now() + 18000;
@@ -63,3 +64,4 @@ export async function complete(
     "Groq is temporarily unavailable or the network timed out. Please retry.",
   );
 }
+

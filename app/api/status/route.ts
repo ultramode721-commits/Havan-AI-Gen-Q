@@ -1,5 +1,6 @@
 import { database } from "@/lib/database";
 import { authorize, failure, noStore } from "@/lib/http";
+import { modelCatalog } from "@/lib/models";
 export const runtime = "nodejs";
 export async function GET(req: Request) {
   try {
@@ -12,6 +13,7 @@ export async function GET(req: Request) {
         issues: d.issues,
         demo: d.demo,
         chatConfigured: !!process.env.GROQ_API_KEY,
+        models: modelCatalog(),
         imageConfigured: !!process.env.IMAGE_API_KEY,
         model: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
         files: ["PDF (text layer)", "DOCX", "TXT", "MD", "JSON"],
@@ -30,3 +32,4 @@ export async function GET(req: Request) {
     return failure(e);
   }
 }
+

@@ -31,6 +31,12 @@ The suite covers schema and domain validation, Unicode tokenization, retrieval l
 
 The milestone adds an auto-growing message field, a document preview with type and size, upload status separate from response generation, and a generation glow attached to the live request state. The existing academy logo has a shimmer animation unless reduced motion is enabled. A browser preview was not available in this environment, so visual device coverage remains unverified.
 
+## Milestone 2 model routing verification
+
+The model routing suite verifies that Havan Pro sends its configured model to Groq, Havan 2.5 Sol sends its configured model to the server-configured Qwen endpoint, provider readiness contains no credentials, and Jarvis reports a clear not-connected error without Qwen configuration. Live provider calls were not made because no provider credentials were supplied. No direct OpenAI API route was added.
+
+Latest checks on 8 November 2026: `npm test` passed 25/25, `npm run typecheck` passed, and `npm run build` passed. The four added routing tests use mocked provider responses and do not incur provider charges.
+
 ## End-to-end student scenario plan
 
 This plan is required before the broader learning features are considered complete. These scenarios were not executed in this audit. Items depending on absent features are marked blocked, not passed.

@@ -33,12 +33,14 @@ import dynamic from "next/dynamic";
 const Exam = dynamic(() => import("./Exam").then((m) => m.Exam));
 const Portal = dynamic(() => import("./Portals").then((m) => m.Portal));
 import { api, download, newId, setAccessToken } from "@/lib/client";
+import type { HavanModelId, RoutedModel } from "@/lib/models";
 type Message = {
   id: string;
   role: "user" | "assistant";
   content: string;
   sources?: { id: string; source: string; title: string }[];
   mode?: string;
+  model?: RoutedModel | null;
 };
 type Chat = { id: string; title: string; messages: Message[] };
 const navigation = [
@@ -58,6 +60,7 @@ export default function HavanApp() {
     [token, setToken] = useState(""),
     [status, setStatus] = useState<any>(null),
     [mode, setMode] = useState<"strict" | "general">("strict"),
+    [havanModel, setHavanModel] = useState<HavanModelId>("havan-pro"),
     [language, setLanguage] = useState("English"),
     [input, setInput] = useState(""),
     [messages, setMessages] = useState<Message[]>([]),
@@ -140,6 +143,7 @@ export default function HavanApp() {
         "/api/chat",
         {
           mode,
+          havanModel,
           language,
           messages: next
             .slice(-20)
@@ -156,6 +160,7 @@ export default function HavanApp() {
           content: result.content,
           sources: result.sources,
           mode: result.mode,
+          model: result.model,
         },
       ];
       setMessages(updated);
@@ -409,8 +414,12 @@ export default function HavanApp() {
                             Havan AI{" "}
                             <span>
                               {m.mode === "strict"
-                                ? "Source excerpts"
-                                : "General tutor"}
+                                ? m.model
+                                  ? `${m.model.label} · ${m.model.provider} ${m.model.providerModel}`
+                                  : "Source excerpts"
+                                : m.model
+                                  ? `${m.model.label} · ${m.model.provider} ${m.model.providerModel}`
+                                  : "General tutor"}
                             </span>
                           </div>
                         )}
@@ -545,6 +554,37 @@ export default function HavanApp() {
                         e.target.value = "";
                       }}
                     />
+                    <label className="model-select">
+                      <Sparkles size={14} />
+                      <select
+                        aria-label="Havan model"
+                        value={havanModel}
+                        onChange={(e) =>
+                          setHavanModel(e.target.value as HavanModelId)
+                        }
+                      >
+                        {[
+                          { id: "havan-pro", label: "Havan Pro", provider: "Groq" },
+                          { id: "havan-sol", label: "Havan 2.5 Sol", provider: "Qwen" },
+                          { id: "havan-jarvis", label: "Havan-3 Jarvis", provider: "Qwen" },
+                        ].map((option) => {
+                          const configured = status?.models?.find(
+                            (item: { id: string; available: boolean }) =>
+                              item.id === option.id,
+                          )?.available;
+                          return (
+                            <option
+                              key={option.id}
+                              value={option.id}
+                              disabled={configured === false}
+                            >
+                              {option.label} · {option.provider}
+                              {configured === false ? " · Setup required" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </label>
                     <label className="mode-select">
                       <ShieldCheck size={15} />
                       <select
