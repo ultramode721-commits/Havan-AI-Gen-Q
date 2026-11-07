@@ -1,0 +1,705 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import {
+  ArrowUp,
+  BookOpen,
+  BrainCircuit,
+  ChartNoAxesCombined,
+  Check,
+  ChevronDown,
+  Code2,
+  Copy,
+  FileText,
+  FlaskConical,
+  Folder,
+  GraduationCap,
+  Menu,
+  MessageCircle,
+  Mic,
+  MoreHorizontal,
+  Moon,
+  Paperclip,
+  Plus,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Square,
+  Sun,
+  X,
+} from "lucide-react";
+import { Markdown } from "./Markdown";
+import dynamic from "next/dynamic";
+const Exam = dynamic(() => import("./Exam").then((m) => m.Exam));
+const Portal = dynamic(() => import("./Portals").then((m) => m.Portal));
+import { api, download, newId, setAccessToken } from "@/lib/client";
+type Message = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  sources?: { id: string; source: string; title: string }[];
+  mode?: string;
+};
+type Chat = { id: string; title: string; messages: Message[] };
+const navigation = [
+  { name: "Chat", icon: MessageCircle },
+  { name: "Predictor", icon: ChartNoAxesCombined },
+  { name: "UAT Simulator", icon: GraduationCap },
+  { name: "Neural Training Portal", icon: BrainCircuit },
+  { name: "Projects", icon: Folder },
+  { name: "Artifacts", icon: Sparkles },
+  { name: "Code", icon: Code2 },
+];
+export default function HavanApp() {
+  const [view, setView] = useState("Chat"),
+    [open, setOpen] = useState(true),
+    [dark, setDark] = useState(false),
+    [settings, setSettings] = useState(false),
+    [token, setToken] = useState(""),
+    [status, setStatus] = useState<any>(null),
+    [mode, setMode] = useState<"strict" | "general">("strict"),
+    [language, setLanguage] = useState("English"),
+    [input, setInput] = useState(""),
+    [messages, setMessages] = useState<Message[]>([]),
+    [chats, setChats] = useState<Chat[]>([]),
+    [chatId, setChatId] = useState(""),
+    [search, setSearch] = useState(""),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(""),
+    [attachment, setAttachment] = useState<{
+      name: string;
+      text: string;
+    } | null>(null),
+    [loaded, setLoaded] = useState(false),
+    [copied, setCopied] = useState("");
+  const [visited, setVisited] = useState<string[]>([]);
+  useEffect(() => {
+    if (["Predictor", "UAT Simulator"].includes(view))
+      setVisited((v) => (v.includes(view) ? v : [...v, view]));
+  }, [view]);
+  const controller = useRef<AbortController | null>(null),
+    bottom = useRef<HTMLDivElement>(null),
+    fileRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    try {
+      setChats(JSON.parse(localStorage.getItem("havan-chats") || "[]"));
+      setDark(localStorage.getItem("havan-theme") === "dark");
+    } catch {}
+    setLoaded(true);
+    void api("/api/status")
+      .then(setStatus)
+      .catch((e) => setError(e.message));
+    return () => controller.current?.abort();
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? "dark" : "light";
+    if (loaded) localStorage.setItem("havan-theme", dark ? "dark" : "light");
+  }, [dark, loaded]);
+  useEffect(() => {
+    if (loaded) localStorage.setItem("havan-chats", JSON.stringify(chats));
+  }, [chats, loaded]);
+  useEffect(() => {
+    bottom.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, busy]);
+  function newChat() {
+    if (busy) return;
+    setView("Chat");
+    setMessages([]);
+    setChatId("");
+    setAttachment(null);
+    setError("");
+  }
+  async function send(prompt = input) {
+    if (!prompt.trim() || busy) return;
+    const id = chatId || newId();
+    setChatId(id);
+    const next: Message[] = [
+      ...messages,
+      { id: newId(), role: "user", content: prompt.trim() },
+    ];
+    setMessages(next);
+    setInput("");
+    setError("");
+    setBusy(true);
+    const ctl = new AbortController();
+    controller.current = ctl;
+    try {
+      const result = await api(
+        "/api/chat",
+        {
+          mode,
+          language,
+          messages: next
+            .slice(-20)
+            .map(({ role, content }) => ({ role, content })),
+          attachment: attachment?.text,
+        },
+        ctl.signal,
+      );
+      const updated: Message[] = [
+        ...next,
+        {
+          id: newId(),
+          role: "assistant",
+          content: result.content,
+          sources: result.sources,
+          mode: result.mode,
+        },
+      ];
+      setMessages(updated);
+      setChats((old) =>
+        [
+          { id, title: next[0].content.slice(0, 60), messages: updated },
+          ...old.filter((c) => c.id !== id),
+        ].slice(0, 50),
+      );
+    } catch (e) {
+      setError(
+        (e as Error).name === "AbortError"
+          ? "Response stopped."
+          : (e as Error).message,
+      );
+    } finally {
+      setBusy(false);
+      controller.current = null;
+    }
+  }
+  async function upload(file: File) {
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Maximum file size is 5 MB.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const result = await api("/api/ingest", form);
+      setAttachment({ name: result.name, text: result.text });
+      setError(
+        result.notice +
+          (result.truncated
+            ? " Only the first 18,000 characters are included."
+            : ""),
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  const welcome = !messages.length;
+  return (
+    <div className={`app ${open ? "sidebar-open" : "sidebar-closed"}`}>
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-mark">
+            <GraduationCap size={25} />
+          </span>
+          <div>
+            <b>Havan AI</b>
+            <small>BY HAVAN ACADEMY</small>
+          </div>
+          <button
+            className="icon collapse"
+            aria-label="Close sidebar"
+            onClick={() => setOpen(false)}
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <button className="new-chat" onClick={newChat} disabled={busy}>
+          <Plus size={19} />
+          New conversation<span>↗</span>
+        </button>
+        <nav>
+          {navigation.map(({ name, icon: Icon }) => (
+            <button
+              disabled={busy && name !== "Chat"}
+              className={view === name ? "active" : ""}
+              onClick={() => {
+                setView(name);
+                if (window.innerWidth < 760) setOpen(false);
+              }}
+              key={name}
+            >
+              <Icon size={18} />
+              {name}
+              {name === "UAT Simulator" && (
+                <span className="tiny">PRACTICE</span>
+              )}
+            </button>
+          ))}
+        </nav>
+        <div className="recent-label">
+          YOUR CONVERSATIONS <Search size={13} />
+        </div>
+        <input
+          className="history-search"
+          aria-label="Search conversations"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search your chats…"
+        />
+        <div className="history">
+          {chats
+            .filter((c) => c.title.toLowerCase().includes(search.toLowerCase()))
+            .map((c) => (
+              <button
+                disabled={busy}
+                onClick={() => {
+                  setView("Chat");
+                  setChatId(c.id);
+                  setMessages(c.messages);
+                  setAttachment(null);
+                }}
+                key={c.id}
+              >
+                <MessageCircle size={14} />
+                <span>{c.title}</span>
+              </button>
+            ))}
+          {!chats.length && <p>Your next discovery starts here.</p>}
+        </div>
+        <div className="academy">
+          <img src="/havan-academy.png" alt="Havan Academy logo" />
+          <div>
+            <b>Built for your next chapter.</b>
+            <small>Ethiopian higher education</small>
+          </div>
+        </div>
+        <button className="profile" onClick={() => setSettings(true)}>
+          <span className="avatar">H</span>
+          <span>
+            Student workspace<small>Local history · Private by default</small>
+          </span>
+          <Settings size={17} />
+        </button>
+      </aside>
+      {open && (
+        <button
+          className="mobile-scrim"
+          aria-label="Close navigation"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      <main>
+        <header className="topbar">
+          <div className="header-left">
+            <button
+              className="icon"
+              aria-label="Toggle navigation"
+              onClick={() => setOpen(!open)}
+            >
+              <Menu size={21} />
+            </button>
+            <span>Havan AI</span>
+            <span className="pill small">ACADEMIC</span>
+          </div>
+          <div className="header-right">
+            <button
+              className="icon"
+              aria-label="Toggle color theme"
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
+            <button
+              className="icon"
+              aria-label="Open settings"
+              onClick={() => setSettings(true)}
+            >
+              <Settings size={19} />
+            </button>
+          </div>
+        </header>
+        {view === "Chat" ? (
+          <div className={`chat-view ${welcome ? "welcome" : ""}`}>
+            <div className="chat-scroll">
+              {welcome ? (
+                <div className="welcome-content">
+                  <span className="eyebrow">
+                    <span className="status-dot" /> YOUR ACADEMIC CO-PILOT
+                  </span>
+                  <div className="hero-brand">
+                    <span className="hero-logo">
+                      <GraduationCap size={44} />
+                    </span>
+                    <h1>Havan AI</h1>
+                  </div>
+                  <h2>
+                    A little curiosity.
+                    <br />
+                    <span>Limitless possibilities.</span>
+                  </h2>
+                  <p className="intro">
+                    From your first question to your next breakthrough.
+                    <br />A study companion for the way you think.
+                  </p>
+                  <div className="suggestions">
+                    {[
+                      {
+                        icon: BookOpen,
+                        title: "Make it make sense",
+                        text: "Explain a freshman concept",
+                        prompt: "Explain equivalent open propositions.",
+                      },
+                      {
+                        icon: GraduationCap,
+                        title: "Ready for your UAT?",
+                        text: "Build confidence with practice",
+                        action: "UAT Simulator",
+                      },
+                      {
+                        icon: FlaskConical,
+                        title: "Go one level deeper",
+                        text: "Explore mathematics & science",
+                        prompt:
+                          "Explain the derivative of a quadratic function.",
+                      },
+                      {
+                        icon: ChartNoAxesCombined,
+                        title: "Find your starting point",
+                        text: "Discover your strengths",
+                        action: "Predictor",
+                      },
+                    ].map(({ icon: Icon, title, text, prompt, action }) => (
+                      <button
+                        key={title}
+                        onClick={() =>
+                          action ? setView(action) : setInput(prompt!)
+                        }
+                      >
+                        <Icon size={20} />
+                        <b>{title}</b>
+                        <span>{text}</span>
+                        <span className="suggest-arrow">↗</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="messages">
+                  {messages.map((m) => (
+                    <article className={`message ${m.role}`} key={m.id}>
+                      {m.role === "assistant" && (
+                        <span className="message-logo">
+                          <GraduationCap size={20} />
+                        </span>
+                      )}
+                      <div className="message-body">
+                        {m.role === "assistant" && (
+                          <div className="message-meta">
+                            Havan AI{" "}
+                            <span>
+                              {m.mode === "strict"
+                                ? "Source excerpts"
+                                : "General tutor"}
+                            </span>
+                          </div>
+                        )}
+                        <Markdown text={m.content} />
+                        {m.sources && m.sources.length > 0 && (
+                          <details className="sources">
+                            <summary>
+                              <FileText size={13} />
+                              {m.sources.length} local source
+                              {m.sources.length === 1 ? "" : "s"}
+                            </summary>
+                            {m.sources.map((s) => (
+                              <p key={s.id}>
+                                <b>
+                                  [{s.id}] {s.title}
+                                </b>
+                                <br />
+                                {s.source}
+                              </p>
+                            ))}
+                          </details>
+                        )}
+                        <button
+                          className="copy icon"
+                          aria-label="Copy message"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(m.content);
+                              setCopied(m.id);
+                            } catch {
+                              setError(
+                                "Clipboard access is unavailable. Select and copy the message manually.",
+                              );
+                            }
+                          }}
+                        >
+                          {copied === m.id ? (
+                            <Check size={14} />
+                          ) : (
+                            <Copy size={14} />
+                          )}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                  {busy && (
+                    <div className="thinking">
+                      <span />
+                      <span />
+                      <span /> Working on your question
+                    </div>
+                  )}
+                  <div ref={bottom} />
+                </div>
+              )}
+            </div>
+            <div className="composer-area">
+              {attachment && (
+                <div className="attachment">
+                  <FileText size={15} />
+                  {attachment.name}
+                  <button
+                    className="icon"
+                    aria-label="Remove attachment"
+                    onClick={() => setAttachment(null)}
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+              )}
+              {error && (
+                <p className="composer-notice" role="status">
+                  {error}
+                </p>
+              )}
+              <form
+                className="composer"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void send();
+                }}
+              >
+                <textarea
+                  aria-label="Message Havan AI"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (
+                      e.key === "Enter" &&
+                      !e.shiftKey &&
+                      !e.nativeEvent.isComposing
+                    ) {
+                      e.preventDefault();
+                      void send();
+                    }
+                  }}
+                  placeholder="Message Havan AI…"
+                  rows={2}
+                  maxLength={12000}
+                />
+                <div className="composer-toolbar">
+                  <div className="actions">
+                    <button
+                      type="button"
+                      className="icon"
+                      disabled={busy}
+                      aria-label="Attach document"
+                      onClick={() => fileRef.current?.click()}
+                    >
+                      <Paperclip size={19} />
+                    </button>
+                    <input
+                      ref={fileRef}
+                      hidden
+                      type="file"
+                      accept=".pdf,.docx,.txt,.md,.json,.csv"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) void upload(e.target.files[0]);
+                        e.target.value = "";
+                      }}
+                    />
+                    <label className="mode-select">
+                      <ShieldCheck size={15} />
+                      <select
+                        aria-label="Answer mode"
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value as typeof mode)}
+                      >
+                        <option value="strict">Database only</option>
+                        <option value="general">General tutor</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="actions">
+                    <select
+                      className="language"
+                      aria-label="Response language"
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                    >
+                      {[
+                        "English",
+                        "Amharic",
+                        "Afaan Oromo",
+                        "Tigrinya",
+                        "Arabic",
+                        "French",
+                        "Spanish",
+                        "Chinese",
+                        "Auto-detect",
+                      ].map((l) => (
+                        <option key={l}>{l}</option>
+                      ))}
+                    </select>
+                    {busy ? (
+                      <button
+                        type="button"
+                        className="send"
+                        aria-label="Stop response"
+                        onClick={() => controller.current?.abort()}
+                      >
+                        <Square size={15} />
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="send"
+                        disabled={!input.trim()}
+                        aria-label="Send message"
+                      >
+                        <ArrowUp size={21} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </form>
+              <div className="composer-footer">
+                <span>
+                  {mode === "strict"
+                    ? "Grounded in your sources. Excerpts stay in the source language."
+                    : "General AI answers may contain mistakes. Verify important information."}
+                </span>
+                <span>Havan Academy</span>
+              </div>
+            </div>
+          </div>
+        ) : view === "Predictor" || view === "UAT Simulator" ? null : (
+          <Portal key={view} view={view} />
+        )}
+        {visited.map((v) => (
+          <div key={v} hidden={view !== v}>
+            <Exam diagnostic={v === "Predictor"} />
+          </div>
+        ))}
+      </main>
+      {settings && (
+        <div className="modal-backdrop" onClick={() => setSettings(false)}>
+          <section
+            className="settings-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Workspace settings"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="between">
+              <h2>Make Havan yours.</h2>
+              <button
+                className="icon"
+                aria-label="Close settings"
+                onClick={() => setSettings(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <label>
+              Preferred response language
+              <input
+                value={language}
+                maxLength={60}
+                onChange={(e) => setLanguage(e.target.value)}
+                placeholder="Any language name"
+              />
+            </label>
+            <label>
+              Appearance
+              <button onClick={() => setDark(!dark)}>
+                {dark ? "Dark" : "Light"} mode — switch
+              </button>
+            </label>
+            <label>
+              Workspace access token
+              <input
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Provided by your deployment administrator"
+                autoComplete="off"
+              />
+            </label>
+            <button
+              className="primary"
+              onClick={async () => {
+                setAccessToken(token);
+                try {
+                  setStatus(await api("/api/status"));
+                  setError("");
+                  setSettings(false);
+                } catch (e) {
+                  setError((e as Error).message);
+                }
+              }}
+            >
+              Connect workspace
+            </button>
+            <p className="muted">
+              Token stays in memory and clears on reload. Chats and project
+              notes stay in this browser; no account or cloud sync is implied.
+            </p>
+            <div className="card">
+              <h3>Service status</h3>
+              <p>
+                Groq:{" "}
+                {status?.chatConfigured
+                  ? "Key configured; live call not verified"
+                  : "Not configured"}
+              </p>
+              <p>
+                Sources: {status?.chunks ?? "—"} passages ·{" "}
+                {status?.questions ?? "—"} questions
+              </p>
+              <p>
+                Images:{" "}
+                {status?.imageConfigured ? "Key configured" : "Not configured"}
+              </p>
+              <p>OCR / image understanding: unavailable</p>
+            </div>
+            <div className="actions">
+              <button
+                onClick={() =>
+                  download(
+                    "havan-conversations.json",
+                    JSON.stringify(chats, null, 2),
+                  )
+                }
+              >
+                Export chats
+              </button>
+              <button
+                onClick={() => {
+                  setChats([]);
+                  setMessages([]);
+                  setChatId("");
+                }}
+              >
+                Clear local chats
+              </button>
+            </div>
+            {error && (
+              <p role="alert" className="error">
+                {error}
+              </p>
+            )}
+          </section>
+        </div>
+      )}
+    </div>
+  );
+}

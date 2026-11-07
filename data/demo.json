@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "chunks": [
+    {
+      "id": "demo-c-1",
+      "title": "Verbal Reasoning practice",
+      "text": "Book is to reading as fork is to _____.\nA book is used for reading. A fork is used for eating.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Verbal Reasoning"
+      ]
+    },
+    {
+      "id": "demo-c-2",
+      "title": "Verbal Reasoning practice",
+      "text": "All engineers in a group study mathematics. Hana is an engineer in that group. What must follow?\nThe rule applies to every engineer in the specified group. Hana belongs to that group, so Hana studies mathematics.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Verbal Reasoning"
+      ]
+    },
+    {
+      "id": "demo-c-3",
+      "title": "Grammar practice",
+      "text": "Choose the correct sentence.\nThe present perfect uses has with a singular third-person subject and the past participle finished.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Grammar"
+      ]
+    },
+    {
+      "id": "demo-c-4",
+      "title": "Grammar practice",
+      "text": "Choose the correct completion: Neither the lecturer nor the students ___ absent.\nWith neither ... nor, the verb agrees with the nearer subject. Students is plural, so are is correct.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Grammar"
+      ]
+    },
+    {
+      "id": "demo-c-5",
+      "title": "Vocabulary practice",
+      "text": "Which word is closest in meaning to meticulous?\nMeticulous means showing great care and attention to detail. Thorough is the closest choice.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Vocabulary"
+      ]
+    },
+    {
+      "id": "demo-c-6",
+      "title": "Vocabulary practice",
+      "text": "Choose the antonym of abundant.\nAbundant means present in large quantities. Scarce means insufficient or difficult to find.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Vocabulary"
+      ]
+    },
+    {
+      "id": "demo-c-7",
+      "title": "Reading Comprehension practice",
+      "text": "Passage: The library extended its opening hours during examination week. Attendance increased, but borrowing remained unchanged. Which statement is directly supported?\nThe passage explicitly says attendance increased. It does not say borrowing increased.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Reading Comprehension"
+      ]
+    },
+    {
+      "id": "demo-c-8",
+      "title": "Reading Comprehension practice",
+      "text": "Passage: Although solar panels cost money initially, they can reduce electricity expenses over time. What is the main idea?\nThe contrast between initial expense and later reduced electricity costs supports the possibility of savings over time, not guaranteed savings for every household.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "English",
+        "Reading Comprehension"
+      ]
+    },
+    {
+      "id": "demo-c-9",
+      "title": "Quantitative Problem Solving practice",
+      "text": "A price rises from 200 birr to 250 birr. What is the percentage increase?\nIncrease = 250 - 200 = 50 birr. Percentage increase = (50 / 200) × 100 = 25%.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "Mathematics",
+        "Quantitative Problem Solving"
+      ]
+    },
+    {
+      "id": "demo-c-10",
+      "title": "Quantitative Problem Solving practice",
+      "text": "Solve $3x + 7 = 22$.\nSubtract 7 from both sides: 3x = 15. Divide by 3: x = 5. Substitution gives 3(5) + 7 = 22.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "Mathematics",
+        "Quantitative Problem Solving"
+      ]
+    },
+    {
+      "id": "demo-c-11",
+      "title": "Analytical Reasoning practice",
+      "text": "What comes next in the sequence 2, 6, 12, 20, 30, ...?\nThe differences are 4, 6, 8, 10. Continuing this pattern gives a difference of 12, so the next term is 30 + 12 = 42.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "Mathematics",
+        "Analytical Reasoning"
+      ]
+    },
+    {
+      "id": "demo-c-12",
+      "title": "Analytical Reasoning practice",
+      "text": "Three students A, B, C stand in a line. A is before B, and B is before C. Which order is possible?\nCombining A before B and B before C gives the unique ordering A, B, C.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained",
+      "language": "en",
+      "tags": [
+        "Mathematics",
+        "Analytical Reasoning"
+      ]
+    },
+    {
+      "id": "demo-predicates",
+      "title": "Equivalent open propositions",
+      "text": "Open propositions P(x) and Q(x) are equivalent over a universe U when P(a) and Q(a) have the same truth value for every a in U. Equivalence depends on the chosen universe. For U = {-1, 1}, x² = 1 and |x| = 1 are both true for every member.",
+      "source": "Havan authored demonstration note — not an official module",
+      "repository": "modules",
+      "language": "en",
+      "tags": [
+        "logic",
+        "predicates",
+        "equivalent",
+        "open propositions",
+        "ሎጂክ"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "demo-q-1",
+      "subject": "English",
+      "domain": "Verbal Reasoning",
+      "text": "Book is to reading as fork is to _____.",
+      "options": [
+        "writing",
+        "eating",
+        "running",
+        "sleeping",
+        "drawing"
+      ],
+      "answer": 1,
+      "explanation": "A book is used for reading. A fork is used for eating.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-2",
+      "subject": "English",
+      "domain": "Verbal Reasoning",
+      "text": "All engineers in a group study mathematics. Hana is an engineer in that group. What must follow?",
+      "options": [
+        "Hana teaches mathematics.",
+        "Everyone studying mathematics is an engineer.",
+        "Hana studies mathematics.",
+        "Hana dislikes mathematics.",
+        "No conclusion follows."
+      ],
+      "answer": 2,
+      "explanation": "The rule applies to every engineer in the specified group. Hana belongs to that group, so Hana studies mathematics.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-3",
+      "subject": "English",
+      "domain": "Grammar",
+      "text": "Choose the correct sentence.",
+      "options": [
+        "She have finished her work.",
+        "She has finish her work.",
+        "She has finished her work.",
+        "She having finished her work.",
+        "She has finishing her work."
+      ],
+      "answer": 2,
+      "explanation": "The present perfect uses has with a singular third-person subject and the past participle finished.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-4",
+      "subject": "English",
+      "domain": "Grammar",
+      "text": "Choose the correct completion: Neither the lecturer nor the students ___ absent.",
+      "options": [
+        "is",
+        "was",
+        "has",
+        "are",
+        "be"
+      ],
+      "answer": 3,
+      "explanation": "With neither ... nor, the verb agrees with the nearer subject. Students is plural, so are is correct.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-5",
+      "subject": "English",
+      "domain": "Vocabulary",
+      "text": "Which word is closest in meaning to meticulous?",
+      "options": [
+        "Careless",
+        "Hasty",
+        "Thorough",
+        "Uncertain",
+        "Angry"
+      ],
+      "answer": 2,
+      "explanation": "Meticulous means showing great care and attention to detail. Thorough is the closest choice.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-6",
+      "subject": "English",
+      "domain": "Vocabulary",
+      "text": "Choose the antonym of abundant.",
+      "options": [
+        "Plentiful",
+        "Copious",
+        "Ample",
+        "Numerous",
+        "Scarce"
+      ],
+      "answer": 4,
+      "explanation": "Abundant means present in large quantities. Scarce means insufficient or difficult to find.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-7",
+      "subject": "English",
+      "domain": "Reading Comprehension",
+      "text": "Passage: The library extended its opening hours during examination week. Attendance increased, but borrowing remained unchanged. Which statement is directly supported?",
+      "options": [
+        "More books were borrowed.",
+        "The library was closed during exams.",
+        "Attendance decreased.",
+        "More students visited the library.",
+        "Every visitor borrowed a book."
+      ],
+      "answer": 3,
+      "explanation": "The passage explicitly says attendance increased. It does not say borrowing increased.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-8",
+      "subject": "English",
+      "domain": "Reading Comprehension",
+      "text": "Passage: Although solar panels cost money initially, they can reduce electricity expenses over time. What is the main idea?",
+      "options": [
+        "Solar panels are always free.",
+        "Initial costs may be offset by later savings.",
+        "Electricity is unnecessary.",
+        "Solar panels never need maintenance.",
+        "Every household must buy panels."
+      ],
+      "answer": 1,
+      "explanation": "The contrast between initial expense and later reduced electricity costs supports the possibility of savings over time, not guaranteed savings for every household.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-9",
+      "subject": "Mathematics",
+      "domain": "Quantitative Problem Solving",
+      "text": "A price rises from 200 birr to 250 birr. What is the percentage increase?",
+      "options": [
+        "10%",
+        "20%",
+        "25%",
+        "50%",
+        "125%"
+      ],
+      "answer": 2,
+      "explanation": "Increase = 250 - 200 = 50 birr. Percentage increase = (50 / 200) × 100 = 25%.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-10",
+      "subject": "Mathematics",
+      "domain": "Quantitative Problem Solving",
+      "text": "Solve $3x + 7 = 22$.",
+      "options": [
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "answer": 2,
+      "explanation": "Subtract 7 from both sides: 3x = 15. Divide by 3: x = 5. Substitution gives 3(5) + 7 = 22.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-11",
+      "subject": "Mathematics",
+      "domain": "Analytical Reasoning",
+      "text": "What comes next in the sequence 2, 6, 12, 20, 30, ...?",
+      "options": [
+        "36",
+        "40",
+        "41",
+        "42",
+        "44"
+      ],
+      "answer": 3,
+      "explanation": "The differences are 4, 6, 8, 10. Continuing this pattern gives a difference of 12, so the next term is 30 + 12 = 42.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    },
+    {
+      "id": "demo-q-12",
+      "subject": "Mathematics",
+      "domain": "Analytical Reasoning",
+      "text": "Three students A, B, C stand in a line. A is before B, and B is before C. Which order is possible?",
+      "options": [
+        "A, B, C",
+        "A, C, B",
+        "B, A, C",
+        "B, C, A",
+        "C, B, A"
+      ],
+      "answer": 0,
+      "explanation": "Combining A before B and B before C gives the unique ordering A, B, C.",
+      "source": "Havan authored demonstration practice — not an official UAT paper",
+      "repository": "trained"
+    }
+  ]
+}
